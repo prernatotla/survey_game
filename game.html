@@ -1,0 +1,52 @@
+<html>
+<head>
+<title>Game</title>
+<style type="text/css">
+#game-div	{
+	background-color:black;
+	height:500px;
+	width:1000px;
+	margin:50px;
+}
+#time-div	{
+	background-color:black;
+	height:120px;
+	width:450px;
+	margin-left:50px;
+	margin-right:50px;
+	float:left;
+}
+#score-div	{
+	background-color:black;
+	height:120px;
+	width:450px;
+	margin-left:50px;
+	margin-right:50px;
+	float:left;
+}
+</style>
+
+<script type="text/javascript" src="stationLayout.js"></script>
+<script type="text/javascript" src="agent.js"></script>
+<script type="text/javascript" src="gamePlay.js"></script>
+<script type="text/javascript">
+/*var agentMinLeft = 60;
+var agentMaxLeft = 1040;
+var agentMinTop = 50;
+var agentMaxTop = 530;
+*/
+
+function initializeGame()	{
+	initializeGameboard();
+	initializeAgent();
+}
+
+</script>
+</head>
+
+<body onload="initializeGame()">
+<div id="game-div"></div>
+<div id="time-div"></div>
+<div id="score-div"></div>
+</body>
+</html>
