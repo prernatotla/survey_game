@@ -3,38 +3,50 @@
 //var left_margin = 50;
 //var station_top_padding = 50;
 //var station_left_padding = 50;
-var station_height = 100;
-var station_width = 100;
+var station_height = 150;
+var station_width = 150;
 var station_horizontal = 300;
 var station_vertical = 200;
 
 var arrow_width = 20;
 
-var game_width = 1000;
-var game_height = 500;
+var game_width = 1200;
+var game_height = 700;
 var time_width = 450;
 var time_height = 120;
 var score_width = 450;
 var score_height = 120;
 
 // Images
-var station_static_image = "images/station.jpg";
+var station_static_image = "images/color_label_oval_grey_T.png";
 var station_highlighted_image = "images/highlighted_station.jpg";
 var arrow_image = "images/arrow.jpg";
+var trophy_image = "images/trophy.png";
 
 
 var stations_json = '{ "stations" : ' +
-'{"1" : {	"top" : 100,	"left" : 100,	"trophies" : 4	},' +
-' "2" : {	"top" : 100,	"left" : 500,	"trophies" : 7	},' +
-' "3" : {	"top" : 100,	"left" : 900,	"trophies" : 3	},' +
-' "4" : {	"top" : 400,	"left" : 100,	"trophies" : 4	},' +
-' "5" : {	"top" : 400,	"left" : 500,	"trophies" : 3	},' +
-' "6" : {	"top" : 400,	"left" : 900,	"trophies" : 5	}}	}';
+'{"1" : {	"top" : 200,	"left" : 50,	"trophies" : 9	},' +
+' "2" : {	"top" : 200,	"left" : 300,	"trophies" : 7	},' +
+' "3" : {	"top" : 200,	"left" : 750,	"trophies" : 35	},' +
+' "4" : {	"top" : 200,	"left" : 1000,	"trophies" : 29	},' +
+' "5" : {	"top" : 500,	"left" : 450,	"trophies" : 6	},' +
+' "6" : {	"top" : 500,	"left" : 850,	"trophies" : 13	}}	}';
 var stations_data = JSON.parse(stations_json);
 var num_stations = 6;//stations_data.stations.length;
 
 var station_loop_time = 1;
 var station_change_time = 0;
+var direct_paths_json = '{ "paths" : ['+
+' {"from":"1", "to":"2", "orientation":"horizontal" }, ' +
+' {"from":"2", "to":"3", "orientation":"horizontal" }, ' +
+' {"from":"3", "to":"4", "orientation":"horizontal" }, ' +
+' {"from":"2", "to":"5", "orientation":"diagonal" }, ' +
+' {"from":"3", "to":"6", "orientation":"diagonal" }, ' +
+' {"from":"5", "to":"6", "orientation":"horizontal" }, ' +
+' {"from":"4", "to":"6", "orientation":"diagonal" } ' +
+' ] }';
+var direct_paths = JSON.parse(direct_paths_json);
+
 var paths_json = '{ "paths" : ['+
 ' {"from":"1", "to":"1", "orientation":"none", "shortest_path": [1], "time":' +station_loop_time+ ' }, ' +
 ' {"from":"1", "to":"2", "orientation":"right", "shortest_path": [1, 2], "time":2 }, ' +
@@ -94,6 +106,25 @@ function createStations()	{
 	}
 }
 
+function initializeStationTrophies(station_id, left, top)	{
+	var trophies_num = stations_data.stations[station_id.toString()]['trophies'];
+	var max_width = 140;
+	var height_buffer = 0;
+	var left_buffer = 0;
+	for (i=1; i<=trophies_num; i++) {
+		height_buffer = 20 * Math.floor(i / (max_width/20));
+		left_buffer = 20 * (i % (max_width/20));
+		var station_elem = document.createElement("img");
+		//alert("Here " + station_id.toString());
+		station_elem.setAttribute("id", "trophy"+station_id.toString()+""+i);
+		station_elem.setAttribute("src", trophy_image);
+		station_elem.setAttribute("height", 20);
+		station_elem.setAttribute("width", 20);
+		station_elem.setAttribute("style", "position: absolute; left:"+(left+left_buffer)+"px; top:"+(top-height_buffer)+"px;");
+		document.getElementById("game-div").appendChild(station_elem);
+	}
+}
+
 function createStationById(station_id, station_image) 	{
 	var top = stations_data.stations[station_id.toString()]['top'];
 	var left = stations_data.stations[station_id.toString()]['left'];
@@ -106,13 +137,82 @@ function createStationById(station_id, station_image) 	{
 	station_elem.setAttribute("width", station_width);
 	station_elem.setAttribute("style", "position: absolute; left:"+left+"px; top:"+top+"px;");
 	document.getElementById("game-div").appendChild(station_elem);
+	
+	initializeStationTrophies(station_id, left, top);
 }
 
 function createPaths()	{
-	for (var i=0; i<paths_data.paths.length; i++)	{
+	var size = 10;
+	for (var i=0; i<direct_paths.paths.length; i++)	{
+		var from_station = direct_paths.paths[i]['from'];
+		var to_station = direct_paths.paths[i]['to'];
+		if (direct_paths.paths[i]['orientation'] == 'horizontal')	{
+			var top = stations_data.stations[from_station.toString()]['top'] + station_height/2 - 5;
+			var start_point_left = stations_data.stations[from_station.toString()]['left'];
+			var end_point_left = stations_data.stations[to_station.toString()]['left'];
+			if (start_point_left > end_point_left)	{
+				var temp = start_point_left;
+				start_point_left = end_point_left;
+				end_point_left = temp;
+			}
+			start_point_left = start_point_left + station_width;
+			for (j=start_point_left; j<end_point_left;)	{
+				var arrow_elem = document.createElement("img");
+				var elem_num = Math.floor(j / (2*size));
+				arrow_elem.setAttribute("src", station_static_image);
+				arrow_elem.setAttribute("height", size);
+				arrow_elem.setAttribute("width", size);
+				arrow_elem.setAttribute("style", "position: absolute; left:"+j+"px; top:"+top+"px; transform:rotate(180deg);");
+				document.getElementById("game-div").appendChild(arrow_elem);
+				j += 2*size;
+			}
+		}
+		else if (direct_paths.paths[i]['orientation'] == 'diagonal')	{
+			var start_point_top = stations_data.stations[from_station.toString()]['top'];;
+			var end_point_top = stations_data.stations[to_station.toString()]['top'];;
+			var start_point_left = stations_data.stations[from_station.toString()]['left'];
+			var end_point_left = stations_data.stations[to_station.toString()]['left'];
+			if (start_point_top > end_point_top)	{
+				var temp = start_point_top;
+				start_point_top = end_point_top;
+				end_point_top = temp;
+				temp = start_point_left;
+				start_point_left = end_point_left;
+				end_point_left = temp;
+			}
+			start_point_top += station_height;
+			start_point_left += station_width/2;
+			for (j=start_point_top; j<end_point_top;)	{
+				var arrow_elem = document.createElement("img");
+				var elem_num = Math.floor(j / (2*size));
+				var left = start_point_left;
+				if (start_point_left < end_point_left)	{
+					left += elem_num*size/2;
+				}
+				else 	{
+					left -= elem_num*size/2;
+				}
+				arrow_elem.setAttribute("src", station_static_image);
+				arrow_elem.setAttribute("height", size);
+				arrow_elem.setAttribute("width", size);
+				arrow_elem.setAttribute("style", "position: absolute; left:"+left+"px; top:"+j+"px; transform:rotate(180deg);");
+				document.getElementById("game-div").appendChild(arrow_elem);
+				j += 2*size;
+			}
+		}
+	}
+
+	/*for (var i=0; i<paths_data.paths.length; i++)	{
 		if (paths_data.paths[i]['orientation'] != 'none')	{
 			var from_station = paths_data.paths[i]['from'];
 			var to_station = paths_data.paths[i]['to'];
+			if (paths_data.paths[i]['orientation'] == 'left')	{
+				var size = 10;
+			}
+			else if (paths_data.paths[i]['orientation'] == 'left')	{
+				//
+			}
+
 			var arrow_elem = document.createElement("img");
 			arrow_elem.setAttribute("id", "arrow"+from_station.toString()+to_station.toString());
 			arrow_elem.setAttribute("src", arrow_image);
@@ -147,33 +247,30 @@ function createPaths()	{
 			}
 			document.getElementById("game-div").appendChild(arrow_elem);
 		}
-	}
+	}*/
 }
 
 
 
 // Time or Life bar
-var max_time = 15;
+var max_time = 90;
 var timeLeft;
-var time_unit_width = (time_width - (2*25)) / max_time;
-var time_unit_height = Math.min(time_unit_width, (time_height - 2*20));
+var time_unit_width = 27;
+var time_unit_height = 27;
+var time_hori_spacer = 2;
+var time_vert_spacer = 4;
 
-var unfilled_heart_image = "images/heart.png";
-var filled_heart_image = "images/heart_filled.png";
+var empty_transparent_image = "images/handtinytrans.gif";
+var filled_heart_image = "images/hourglass-md.png";
 
 
-function createTimeUnit(left,top,filled,id)	{
+function createTimeUnit(left,top,id)	{
 	var time_elem = document.createElement("img");
 	time_elem.setAttribute("id", "time"+id.toString());
-	if (filled)	{
-		time_elem.setAttribute("src", filled_heart_image);
-	}
-	else 	{
-		time_elem.setAttribute("src", unfilled_heart_image);
-	}
+	time_elem.setAttribute("src", filled_heart_image);
 	time_elem.setAttribute("height", time_unit_height);
 	time_elem.setAttribute("width", time_unit_width);
-	time_elem.setAttribute("style", "position: absolute; left:"+left+"px; top:"+top+"px;");
+	time_elem.setAttribute("style", "position: relative; left:"+left+"px;top:"+top+"px;");
 	document.getElementById("time-div").appendChild(time_elem);
 }
 
@@ -182,6 +279,10 @@ function updateTime(timeTaken)	{
 		alert("Illegal move");
 		return false;
 	}
+	for(id=timeLeft-1; id >= (timeLeft - timeTaken); id--) {
+		document.getElementById("time"+id.toString()).src = empty_transparent_image;
+		//alert('change');
+	}
 	timeLeft -= timeTaken;
 	if (timeLeft > max_time)	{
 		timeLeft = max_time;
@@ -189,23 +290,14 @@ function updateTime(timeTaken)	{
 	if (timeLeft < 0)	{
 		timeLeft = 0;
 	}
-	var i,top,left;
-	for (i=0; i<timeLeft; i++)	{
-		top = game_height + 2*50 + 20; // 50 is margin for game-div. 20 is buffer considered for heart images
-		left = 50 + 25 + i*time_unit_width; // 50 is left margin. 25 is buffer considered for heart images
-		createTimeUnit(left, top, true, i);
-	}
-	for (; i<max_time; i++)	{
-		top = game_height + 2*50 + 20; // 50 is margin for game-div. 20 is buffer considered for heart images
-		left = 50 + 25 + i*time_unit_width; // 50 is left margin. 25 is buffer considered for heart images
-		createTimeUnit(left, top, false, i);
-	}
 	return true;
 }
 
 function initializeTime()	{
 	timeLeft = max_time;
-	updateTime(0);
+	for (i=0; i<max_time; i++)	{
+		createTimeUnit(time_hori_spacer, time_vert_spacer, i);
+	}
 }
 
 
@@ -214,11 +306,14 @@ var max_score = 50;
 var max_score_width = 400;
 var total_score = 0;
 
-var unfilled_score_image = "images/score_unfilled.jpg";
-var filled_score_image = "images/score_filled.jpg";
-var trophy_image = "images/trophy.jpg";
+// get position of score board for animation
 
-function updateScore(score)	{
+
+//var unfilled_score_image = "images/hourglass-md.png";
+//var filled_score_image = "images/score_filled.jpg";
+
+
+function updateScore(station_id, score)	{
 	total_score += score;
 	if (total_score < 0)	{
 		total_score = 0;
@@ -226,31 +321,49 @@ function updateScore(score)	{
 	if (total_score > max_score)	{
 		total_score = max_score;
 	}
-	var filled_score_elem = document.createElement("img");
-	filled_score_elem.setAttribute("id", "filled_score_bar");
-	filled_score_elem.setAttribute("src", filled_score_image);
-	filled_score_elem.setAttribute("height", 40);
-	filled_score_elem.setAttribute("width", (total_score/max_score)*max_score_width);
-	filled_score_elem.setAttribute("style", "position: absolute; left:"+625+"px; top:"+620+"px;");
-	document.getElementById("score-div").appendChild(filled_score_elem);
-
-	var unfilled_score_elem = document.createElement("img");
-	unfilled_score_elem.setAttribute("id", "unfilled_score_bar");
-	unfilled_score_elem.setAttribute("src", unfilled_score_image);
-	unfilled_score_elem.setAttribute("height", 40);
-	unfilled_score_elem.setAttribute("width", (1-total_score/max_score)*max_score_width);
-	var unfilled_width = 625 + (total_score/max_score)*max_score_width;
-	unfilled_score_elem.setAttribute("style", "position: absolute; left:"+unfilled_width+"px; top:"+620+"px;");
-	document.getElementById("score-div").appendChild(unfilled_score_elem);
+	var trophy_elems = new Array(score);
+	for (var i=1; i<=score; i++) {
+		trophy_elems[i-1] = document.getElementById("trophy"+station_id.toString()+""+i)
+	}
+	disable_play();
+	move_all(trophy_elems, score_left, score_top, post_animation_score, 5);
+	
+	function post_animation_score() {
+		for (var i=1; i<=score; i++) {
+			trophy_elems[i-1].src = empty_transparent_image;
+		}
+		for (var i=total_score-score; i< total_score; i++)	{
+			var trophy_elem = document.createElement("img");
+			trophy_elem.setAttribute("id", "trophy_bar"+i);
+			trophy_elem.setAttribute("src", trophy_image);
+			trophy_elem.setAttribute("height", 30);
+			trophy_elem.setAttribute("width", 30);
+			trophy_elem.setAttribute("style", "position: relative; left:"+2+"px; top:"+2+"px;");
+			document.getElementById("score-div").appendChild(trophy_elem);
+		}
+		enable_play();
+	}
 }
 
+var score_left = 0;
+var score_top = 0;
 function initializeScore()	{
-	updateScore(0);
-	var trophy_elem = document.createElement("img");
-	trophy_elem.setAttribute("id", "trophy_bar");
-	trophy_elem.setAttribute("src", trophy_image);
-	trophy_elem.setAttribute("height", 30);
-	trophy_elem.setAttribute("width", 30);
-	trophy_elem.setAttribute("style", "position: absolute; left:"+625+"px; top:"+680+"px;");
-	document.getElementById("score-div").appendChild(trophy_elem);
+	// get location of score div (using jQuery)
+	var offset = $(document.getElementById("score-div")).offset();
+	score_left = offset.left
+	score_top = offset.top;
+}
+
+//disable clicks (for animation in progress)
+function disable_play() {
+
+}
+
+// enable clicks (after animation)
+function enable_play() {
+	for (var station_id=1; station_id<=num_stations; station_id++)	{
+		var top = stations_data.stations[station_id.toString()]['top'];
+		var left = stations_data.stations[station_id.toString()]['left'];
+		initializeStationTrophies(station_id, left, top);
+	}
 }

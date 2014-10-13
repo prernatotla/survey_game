@@ -13,7 +13,6 @@ function initializeAgent()	{
 	agentPosition_x = station_left + (station_width - agentSize)/2;
 	agentPosition_y = station_top + (station_height - agentSize)/2;
 	createAgent();
-	//window.addEventListener("keydown", keydownAction, false);
 }
 
 function createAgent()	{
@@ -37,41 +36,4 @@ function moveAgent(fromStation, toStation)	{
 	// Choose shortest path and move agent
 }
 
-/*
-function keydownAction(event) {
-	var keyCode = event.keyCode;
-	if ([37, 38, 39, 40].indexOf(keyCode) > -1) {
-		event.preventDefault();
-	}
-
-	if (keyCode == 38) {
-		// up
-		agentPosition_y -= agentSize;
-		if (agentPosition_y < agentMinTop)	{
-			agentPosition_y = agentMinTop;
-		}
-	} else if (keyCode == 40) {
-		// down
-		agentPosition_y += agentSize;
-		if (agentPosition_y > agentMaxTop)	{
-			agentPosition_y = agentMaxTop;
-		}
-	} else if (keyCode == 37) {
-		// left
-		agentPosition_x -= agentSize;
-		if (agentPosition_x < agentMinLeft)	{
-			agentPosition_x = agentMinLeft;
-		}
-
-	} else if (keyCode == 39) {
-		// right
-		agentPosition_x += agentSize;
-		if (agentPosition_x > agentMaxLeft)	{
-			agentPosition_x = agentMaxLeft;
-		}
-	}
-	//refreshAgent();
-	changePosition();
-}
-*/
 

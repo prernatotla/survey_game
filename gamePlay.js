@@ -92,7 +92,7 @@ function updateTimeAndScore()	{
 				}
 				else 	{
 					alert("Success!!");
-					updateScore(stations_data.stations[to_station.toString()]['trophies']);
+					updateScore(to_station.toString(), stations_data.stations[to_station.toString()]['trophies']);
 				}
 			}
 			return updated;
@@ -107,6 +107,54 @@ function checkForOfficer()	{
 		return true;
 	}
 	return false;
+}
+
+// callback is the function to run after animation 
+// speed is in ms, lower value faster animation
+function move(elem, target_left, target_top, callback, speed) {
+	var offset = $( elem ).offset();
+	var left = offset.left;
+	var top = offset.top;
+	var ratio = (target_top - offset.top)/(target_left - offset.left);
+	function frame() {
+		left++;  // update parameters
+		top = top + ratio;
+		elem.style.left = left + 'px'; // show frame
+		elem.style.top = top + 'px'; // show frame
+		if (left == target_left) { // check finish condition
+		  clearInterval(id);
+		  callback();
+		}
+	}
+	var id = setInterval(frame, speed); // draw every 10ms
+	return true;
+}
+
+// callback is the function to run after animation 
+// speed is in ms, lower value faster animation
+function move_all(elems, target_left, target_top, callback, speed) {
+	if(elems.length == 0) {
+		return false;
+	}
+	var offset = new Array(elems.length);
+	for(var i=0; i<elems.length;i++) {
+		offset[i] = $( elems[i] ).offset();
+	}
+	var ratio = (target_top - offset[0].top)/(target_left - offset[0].left);
+	function frame() {
+		for(var i=0; i<elems.length;i++) {
+			offset[i].left = offset[i].left + 1;
+			offset[i].top = offset[i].top + ratio;
+			elems[i].style.left = offset[i].left + 'px'; // show frame
+			elems[i].style.top = offset[i].top + 'px'; // show frame
+		}
+		if (offset[0].left == target_left) { // check finish condition
+		  clearInterval(id);
+		  callback();
+		}
+	}
+	var id = setInterval(frame, speed); // draw every 10ms
+	return true;
 }
 
 
