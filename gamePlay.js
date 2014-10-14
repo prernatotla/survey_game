@@ -5,6 +5,8 @@ var officer_present = false;
 // For now consider a random array of length 15. Modify this to consider a random sampling from data later
 var officer_strategy = [1,2,5,4,5,6,6,2,2,1,2,3,3,4,6];
 
+var exit_rate = 0.2;
+
 function addEventListeners()	{
 	if (checkGameOver())	{
 		return;
@@ -27,22 +29,13 @@ function highlightStation()	{
 		return;
 	}
 	if (from_station != null)	{
-		/*hstation_obj = document.getElementById("station"+from_station.toString());
-		if (hstation_obj != null)	{
-			hstation_obj.remove();
-		}*/
-		//createStationById(from_station, station_static_image);
 		changeImageSource("station"+from_station.toString(), station_static_image);
 	}
 	if (to_station != null)	{
-		//createStationById(to_station, station_highlighted_image);
 		changeImageSource("station"+to_station.toString(), station_highlighted_image);
-		from_station = to_station;
-		to_station = null;
 	}
-	removeEventListeners();
-	while (moveAgent())	{}
-	addEventListeners();
+	disable_play();
+	moveAgent();
 }
 
 function onStationClick(event)	{
@@ -53,12 +46,33 @@ function onStationClick(event)	{
 }
 
 function moveAgent()	{
-	var station_top = stations_data.stations[from_station.toString()]['top'];
-	var station_left = stations_data.stations[from_station.toString()]['left'];
-	agentPosition_x = station_left + (station_width - agentSize)/2;
-	agentPosition_y = station_top + (station_height - agentSize)/2;
-	changePosition();
-	return false;
+	var shortest_path = null;
+	for (var i=0; i<paths_data.paths.length; i++)	{
+		if (paths_data.paths[i]['from'] == from_station && paths_data.paths[i]['to'] == to_station)	{
+			shortest_path = paths_data.paths[i]['shortest_path'];
+			break;
+		}
+	}
+
+	if (shortest_path.length < 2)	{
+		enable_play();
+		return;
+	}
+	var i=0;
+	moveNext();
+	function moveNext()	{
+		var from = shortest_path[i];
+		var to = shortest_path[i+1];
+		var station_top = stations_data.stations[to.toString()]['top'];
+		var station_left = stations_data.stations[to.toString()]['left'];
+		var agentElem = document.getElementById('agent-img');
+		var callback =  moveNext;
+		i += 1;
+		if (i == shortest_path.length-1)	{
+			callback = enable_play
+		}
+		move(agentElem, (station_left + (station_width - agentSize)/2), (station_top + (station_height - agentSize)/2), callback, 10);
+	}
 }
 
 function checkGameOver()	{
@@ -115,10 +129,16 @@ function move(elem, target_left, target_top, callback, speed) {
 	var offset = $( elem ).offset();
 	var left = offset.left;
 	var top = offset.top;
-	var ratio = (target_top - offset.top)/(target_left - offset.left);
+	var ratio = Math.abs(target_top - offset.top)/Math.abs(target_left - offset.left);
 	function frame() {
-		left++;  // update parameters
-		top = top + ratio;
+		if (target_left > left)
+			left++;  // update parameters
+		else
+			left--;
+		if (target_top > top)
+			top = top + ratio;
+		else
+			top = top - ratio;
 		elem.style.left = left + 'px'; // show frame
 		elem.style.top = top + 'px'; // show frame
 		if (left == target_left) { // check finish condition

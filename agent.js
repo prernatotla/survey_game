@@ -1,5 +1,5 @@
-var agentSize = 20;
-var agentImage = "images/agent.jpg";
+var agentSize = 50;
+var agentImage = "images/agent.png";
 var agentPosition_x;
 var agentPosition_y;
 

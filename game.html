@@ -2,6 +2,14 @@
 <head>
 <title>Game</title>
 <style type="text/css">
+#instructions-div	{
+	background-color:#c0c0c0;
+	display: inline-block;
+	float: center;
+	height:700px;
+	width:1180px;
+	margin:20px;
+}
 #game-div	{
 	background-color:black;
 	display: inline-block;
@@ -51,10 +59,16 @@ function initializeGame()	{
 <body onload="initializeGame()">
 <div id="game-div"></div>
 <div id="score-div">
-<font color="white" size="6"><b>Score:</b></font>
+	<div id="score-label" style="width:130px; float:left; font-size:25px; color:white;">
+	<b>Score:</b>
+	</div>
+	<div id="score-value" style="width:130px; float:right; font-size:25px; color:white;">0</div>
 </div>
 <div id="time-div">
-<font color="white" size="6"><b>Time:</b></font>
+	<div id="time-label" style="width:130px; float:left; font-size:25px; color:white;">
+	<b>Time:</b>
+	</div>
+	<div id="time-value" style="width:130px; float:right; font-size:25px; color:white;">0</div>
 </div>
 </body>
 </html>
