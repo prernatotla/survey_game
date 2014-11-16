@@ -2,73 +2,298 @@
 <head>
 <title>Game</title>
 <style type="text/css">
-#instructions-div	{
-	background-color:#c0c0c0;
-	display: inline-block;
-	float: center;
-	height:700px;
-	width:1180px;
-	margin:20px;
+#left-div	{
+	margin: 10px;
+	float: left;
+}
+#main-div	{
+	zoom:80%;
+	-moz-zoom:80%;
+	-webkit-zoom:80%;
 }
 #game-div	{
-	background-color:black;
-	display: inline-block;
+	background-color:#2f102f;
+	position: relative;
 	float: left;
-	height:700px;
-	width:1180px;
+	height:600px;
+	width:1350px;
 	margin:20px;
+	border-radius: 15px;
+	display: block;
+}
+#strategy_pic	{
+	position: relative;
+	display:block;
+	width:1400px;
+	clear: both;
+	float: left;
+	margin: 20px;
+}
+#right-div	{
+	position: relative;
+	width:380px;
+	height:1100px;
+	margin:20px;
+	margin-left: 1480px;
 }
 #time-div	{
-	background-color:#606060;
-	height:340px;
-	width:270px;
-	float:right;
-	clear: right;
+	position: relative;
+	height:280px;
+	width:90%;
+	margin-left:20px;
+	margin-right:20px;
+	margin-top:15px;
+	background-color:#404040;
+	border-radius: 15px;
+	display: block;
+	padding: 10px;
+	float: left;
 }
 #score-div	{
-	background-color:#606060;
-	height:340px;
-	width:270px;
-	margin-bottom:20px;
+	position: relative;
+	height:300px;
+	width:90%;
+	margin-left:20px;
 	margin-top:20px;
-	float:right;
-	
+	margin-right:20px;
+	background-color:#404040;
+	border-radius: 15px;
+	display: block;
+	padding: 10px;
+	float: left;
 }
+#instructions-div	{
+	background-color:#909090;
+	position: relative;
+	float: left;
+	height:380px;
+	width:90%;
+	margin-bottom:10px;
+	margin-top:20px;
+	margin-left: 20px;
+	border-radius: 10px;
+	font-size:34px;
+	color:500050;
+	display: block;
+	padding: 10px;
+}
+#instructions 	{
+	position:relative;
+	left: 100px;
+	margin-top:50px;
+	float: left;
+	font-size:20px;
+	color:500050;
+	display: block;
+}
+
+#overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 650px;
+    width: 100%;
+    background-color: rgba(0,0,0,0.95);
+    z-index: 10;
+}
+#overlay-content {
+    width: 80%;
+    height: 85%;
+    font-size: 22px;
+    position: fixed;
+    top: 20%; 
+    left: 20%;
+    margin-top: -120px;
+    margin-left: -150px;
+    padding:30px;
+    background-color: #b088c0;
+    color: black;
+    border-radius: 18px;
+    text-align: justify;
+    z-index: 11; /* 1px higher than the overlay layer */
+    overflow: auto;
+}
+
 </style>
 
 <script type="text/javascript" src="jquery-1.10.2.js"></script>
 <script type="text/javascript" src="stationLayout.js"></script>
+<script type="text/javascript" src="round_0.js"></script>
+<script type="text/javascript" src="round_1.js"></script>
+<script type="text/javascript" src="round_2.js"></script>
+<script type="text/javascript" src="round_3.js"></script>
+<script type="text/javascript" src="round_4.js"></script>
 <script type="text/javascript" src="agent.js"></script>
 <script type="text/javascript" src="gamePlay.js"></script>
+<script type="text/javascript" src="officer_strategy.js"></script>
 
 <script type="text/javascript">
-/*var agentMinLeft = 60;
-var agentMaxLeft = 1040;
-var agentMinTop = 50;
-var agentMaxTop = 530;
-*/
 
 function initializeGame()	{
 	initializeGameboard();
 	initializeAgent();
+	var prmstr = window.location.search.substr(1);
+	var prmarr = prmstr.split("=");
+	amt_id = prmarr[1];
+	//showOverlay();
+}
+
+function showOverlay()	{
+	document.getElementById('overlay').style.visibility = "visible";
+	document.getElementById('overlay-content').style.visibility = "visible";
+	instruction_page = 1;
+	showInstruction(-1);
+}
+
+function hideOverlay()	{
+	document.getElementById('overlay').style.visibility = "hidden";
+	document.getElementById('overlay-content').style.visibility = "hidden";
+}
+var instruction_page = 1;
+
+function showInstruction(div_number)	{
+	if (div_number < 0)	{//Previous
+		div_number = instruction_page - 1;
+		if (div_number < 1)	{
+			div_number = 1;
+		}
+	}
+	else if (div_number > 0)	{ //Next
+		div_number = instruction_page + 1;
+		if (div_number > 6)	{
+			div_number = 6;
+		}
+	}
+	instruction_page = div_number;
+	//Hide all
+	for (var i=1; i<=6; i++)	{
+		document.getElementById('instruction_'+i).style.display = "none";
+	}
+	document.getElementById('instruction_'+div_number).style.display = "block";
 }
 
 </script>
 </head>
 
-<body onload="initializeGame()">
-<div id="game-div"></div>
-<div id="score-div">
-	<div id="score-label" style="width:130px; float:left; font-size:25px; color:white;">
-	<b>Score:</b>
+<body onload="initializeGame()" bgcolor="#aaaaaa">
+<div id="main-div">
+	<div id="left-div">
+		<div id="game-div"></div>
+		<div id="strategy_pic"></div>
 	</div>
-	<div id="score-value" style="width:130px; float:right; font-size:25px; color:white;">0</div>
-</div>
-<div id="time-div">
-	<div id="time-label" style="width:130px; float:left; font-size:25px; color:white;">
-	<b>Time:</b>
+	<div id="right-div">
+		<div id="instructions-div">
+			<br><b>MESSAGE BOARD:</b><br><br>
+			<br>&nbsp&nbsp&nbsp Click any station to move there.....
+			<br><br><br>
+		</div>
+		<div id="score-div">
+			<div id="score-label" style="width:50%; float:left; font-size:25px; color:white;">
+			<b>SCORE:</b>
+			</div>
+			<div id="score-value" style="width:50%; float:right; font-size:25px; color:white;">0</div>
+		</div>
+		<div id="time-div">
+			<div id="time-label" style="width:50%; float:left; font-size:25px; color:white;">
+			<b>TIME:</b>
+			</div>
+			<div id="time-value" style="width:50%; float:right; font-size:25px; color:white;">0</div>
+		</div>
+		<button id="instructions" onclick="showOverlay()">Full Instructions!</button>
 	</div>
-	<div id="time-value" style="width:130px; float:right; font-size:25px; color:white;">0</div>
+	<div id="overlay"></div>
+	<div id="overlay-content">
+		<div id="close_button" align="right">
+			<button onclick="hideOverlay()" style="position:relative;">CLOSE</button>
+		</div>
+		<div id="page_navigation_buttons" align="center">
+			<button onclick="showInstruction(-1)" style="position:relative;">Prev</button>&nbsp&nbsp&nbsp&nbsp
+			&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+			<button onclick="showInstruction(1)" style="position:relative;">Next</button>
+			<br><br>
+		</div>
+		<div id="text-div">
+			<center>INSTRUCTIONS:</center>
+			<div id="instruction_1" style="display:block">
+				<br><br>
+				<center><b>Overview</b></center>
+				<br>
+				The game is set in a Metro line. You will play the role of a treasure hunter who is select station(s) on the Metro trains to gather some treasures which are represented as stars.
+				<br>
+				There are also officers in the metro line who are looking to prevent you from getting the stars. You will be given information about the presence of officer at the station. <b>If there is an officer at the station, you cannot have the stars but you can continue playing the game.</b>
+				<br><br>
+				So, the idea is to play a game in the limited time you are given, visiting stations to gather stars, which you can only get when there are no officers at the station.
+				<br>
+				Consider that <b>officers may move</b> from one station to another. At the beginning of the game, we will provide some potential officer patrol patterns.
+				<br>
+				The game ends in one of two ways: (1) you run out of time or (2) the game randomly ends after your visit a station.
+				<br><br>
+				More details regarding 'how to play the game' are provided on the next page.
+			</div>
+			<div id="instruction_2" style="display:none">
+				<br><br>
+				<center><b>Rounds & Compensations</b></center>
+				<br>
+				<u>Study Tasks:</u><br>
+				You will play 6 games and answer a few survey questions. This will take approximately 30 minutes in total. The first 2 games will be trial games. These <b>trial games will not affect your compensation</b>. They will help you familiarize yourself with the game interface. The next 4 games are actual games that will determine your compensation.
+				<br><br>
+				<u>Compensation Details:</u><br>
+				You can earn 2 types of compensation for participating in our experiment. Please read carefully the details below.
+				<br><b>Base:</b> You will be given $1 for participating in this round of the experiment.
+				<br><b>Performance Bonus:</b> In addition, for every star earned, you will get $0.01.
+				<br>
+			</div>
+			<div id="instruction_3" style="display:none">
+				<br><br>
+				<center><b>Treasure (Stars) & Hunter (you)</b></center>
+				<br>
+				There are some stars at each station. There will be different numbers of stars at different stations.
+				<br>
+				For example, there are 9 stars at station 1 and 7 at station 2.
+				<br>
+				<center><img src="./images/instructions_2.jpg" alt="Instruction 2" width= "40%" /></center>
+				<br><br>
+				This icon represents you. Your first station will be chosen randomly and then you can choose to stay or move to other station.
+				<br><br>
+				<center>
+					<img src="./images/agent.png" alt="Instruction 2" width= "15%" />
+					&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+					<img src="./images/instructions_3.jpg" alt="Instruction 3" width= "15%" />
+				</center>
+				<br>
+			</div>
+			<div id="instruction_4" style="display:none">
+				<br><br>
+				<center><b>Score</b></center>
+				<br>
+				After selecting a station, your icon will move to the selected station (or stay still if you choose the same station). Then, you will be informed if there is an officer at the station or not.
+				<br>
+				If there is an officer at the station, you cannot have the stars at that specific station.
+				<br>
+				If there is no officer, the color will be changed to green, and you get the stars, which will be added to your score board.
+				<br><br><br>
+				<center><img src="./images/instructions_5.jpg" alt="Instruction 5" width= "35%" /></center>
+				<br>
+			</div>
+			<div id="instruction_5" style="display:none">
+				<br><br>
+				<center><b>Game Termination</b></center>
+				<br>
+				Please consider that you have a limited time to play the game. You will begin with <b>100 time units</b>, represented by hourglasses. For each instance that you select a station, your available time will be reduced by 1 hourglass. It also takes time to travel from one station to another.<br><br><br>
+				<center><img src="./images/instructions_6.jpg" alt="Instruction 5" width= "35%" /></center>
+				<br>
+				Also, after checking any station, there is a chance that the game will end, independently of the amount of time remaining. The chance that your game will end is shown by the Termination Randomizer roulette. If the arrow stops at the red area, the game is over. If it lands on green area you can continue playing the game.
+				<br>
+				Summarizing, there are two situations that will end your game: 
+				<br>
+				(1) After checking a station, the yellow arrow lands on red are in the Termination Randomizer roulette; 
+				<br>
+				(2) You run out of available time.
+				<br>
+			</div>
+			<div id="instruction_6" style="display:none"></div>
+		</div>
+	</div>
 </div>
 </body>
 </html>

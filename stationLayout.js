@@ -15,81 +15,111 @@ var score_height = 120;
 
 // Images
 var station_static_image = "images/station.png";
-var station_highlighted_image = "images/highlighted_station.jpg";
-var arrow_image = "images/arrow.jpg";
+var station_highlighted_stop_image = "images/highlighted_red.png";
+var station_highlighted_image = "images/highlighted_green.png";
 var trophy_image = "images/trophy.png";
+var roulette_image = "images/roulette.png";
+var dial_image = "images/dial.png";
+var police_image = "images/police.png";
+
+var stations_data;
+var num_stations = 6;
+
+var direct_paths;
 
 
-var stations_json = '{ "stations" : ' +
-'{"1" : {	"top" : 200,	"left" : 50,	"trophies" : 9	},' +
-' "2" : {	"top" : 200,	"left" : 300,	"trophies" : 7	},' +
-' "3" : {	"top" : 200,	"left" : 750,	"trophies" : 35	},' +
-' "4" : {	"top" : 200,	"left" : 1000,	"trophies" : 29	},' +
-' "5" : {	"top" : 500,	"left" : 450,	"trophies" : 6	},' +
-' "6" : {	"top" : 500,	"left" : 850,	"trophies" : 13	}}	}';
-var stations_data = JSON.parse(stations_json);
-var num_stations = 6;//stations_data.stations.length;
+var paths_data;
 
-var station_loop_time = 1;
-var station_change_time = 0;
-var direct_paths_json = '{ "paths" : ['+
-' {"from":"1", "to":"2", "orientation":"horizontal" }, ' +
-' {"from":"2", "to":"3", "orientation":"horizontal" }, ' +
-' {"from":"3", "to":"4", "orientation":"horizontal" }, ' +
-' {"from":"2", "to":"5", "orientation":"diagonal" }, ' +
-' {"from":"3", "to":"6", "orientation":"diagonal" }, ' +
-' {"from":"5", "to":"6", "orientation":"horizontal" }, ' +
-' {"from":"4", "to":"6", "orientation":"diagonal" } ' +
-' ] }';
-var direct_paths = JSON.parse(direct_paths_json);
-
-var paths_json = '{ "paths" : ['+
-' {"from":"1", "to":"1", "shortest_path": [1], "time":' +station_loop_time+ ' }, ' +
-' {"from":"1", "to":"2", "shortest_path": [1, 2], "time":1 }, ' +
-' {"from":"1", "to":"3", "shortest_path": [1, 2, 3], "time":' + (4+station_change_time) + ' }, ' +
-' {"from":"1", "to":"4", "shortest_path": [1, 2, 3, 4], "time":' + (5+2*station_change_time) + ' }, ' +
-' {"from":"1", "to":"5", "shortest_path": [1, 2, 5], "time":' + (3+station_change_time) + ' }, ' +
-' {"from":"1", "to":"6", "shortest_path": [1, 2, 5, 6], "time":' + (6+2*station_change_time) + ' }, ' +
-' {"from":"2", "to":"1", "shortest_path": [2, 1], "time":1 }, ' +
-' {"from":"2", "to":"2", "shortest_path": [2], "time":' +station_loop_time+ ' }, ' +
-' {"from":"2", "to":"3", "shortest_path": [2, 3], "time":3 }, ' +
-' {"from":"2", "to":"4", "shortest_path": [2, 3, 4], "time":' + (4+station_change_time) + ' }, ' +
-' {"from":"2", "to":"5", "shortest_path": [2, 5], "time":2 }, ' +
-' {"from":"2", "to":"6", "shortest_path": [2, 5, 6], "time":' + (5+station_change_time) + ' }, ' +
-' {"from":"3", "to":"1", "shortest_path": [3, 2, 1], "time":' + (4+station_change_time) + ' }, ' +
-' {"from":"3", "to":"2", "shortest_path": [3, 2], "time":3 }, ' +
-' {"from":"3", "to":"3", "shortest_path": [3], "time":' +station_loop_time+ ' }, ' +
-' {"from":"3", "to":"4", "shortest_path": [3, 4], "time":1 }, ' +
-' {"from":"3", "to":"5", "shortest_path": [3, 2, 5], "time":' + (5+station_change_time) + ' }, ' +
-' {"from":"3", "to":"6", "shortest_path": [3, 6], "time":3 }, ' +
-' {"from":"4", "to":"1", "shortest_path": [4, 3, 2, 1], "time":' + (5+2*station_change_time) + ' }, ' +
-' {"from":"4", "to":"2", "shortest_path": [4, 3, 2], "time":' + (4+station_change_time) + ' }, ' +
-' {"from":"4", "to":"3", "shortest_path": [4, 3], "time":1 }, ' +
-' {"from":"4", "to":"4", "shortest_path": [4], "time":' +station_loop_time+ ' }, ' +
-' {"from":"4", "to":"5", "shortest_path": [4, 6, 5], "time":' + (4+2*station_change_time) + ' }, ' +
-' {"from":"4", "to":"6", "shortest_path": [4, 6], "time":1 }, ' +
-' {"from":"5", "to":"1", "shortest_path": [5, 2, 1], "time":' + (3+station_change_time) + ' }, ' +
-' {"from":"5", "to":"2", "shortest_path": [5, 2], "time":2 }, ' +
-' {"from":"5", "to":"3", "shortest_path": [5, 2, 3], "time":' + (5+station_change_time) + ' }, ' +
-' {"from":"5", "to":"4", "shortest_path": [5, 6, 4], "time":' + (4+2*station_change_time) + ' }, ' +
-' {"from":"5", "to":"5", "shortest_path": [5], "time":' +station_loop_time+ ' }, ' +
-' {"from":"5", "to":"6", "shortest_path": [5, 6], "time":3 }, ' +
-' {"from":"6", "to":"1", "shortest_path": [6, 5, 2, 1], "time":' + (6+2*station_change_time) + ' }, ' +
-' {"from":"6", "to":"2", "shortest_path": [6, 5, 2], "time":' + (5+station_change_time) + ' }, ' +
-' {"from":"6", "to":"3", "shortest_path": [6, 3], "time":3 }, ' +
-' {"from":"6", "to":"4", "shortest_path": [6, 4], "time":1 }, ' +
-' {"from":"6", "to":"5", "shortest_path": [6, 5], "time":3 }, ' +
-' {"from":"6", "to":"6", "shortest_path": [6], "time":' +station_loop_time+ ' } ' +
-' ] }';
-var paths_data = JSON.parse(paths_json);
+var transition_json = '{ "transitions" : ['+
+' {"1":{"1":34, "2":66}, "2":{"1":18, "2":36, "3":46}, "3":{"2":43, "3":57}, "4":{"4":63, "6":37}, "5":{"5":64, "6":36}, "6":{"4":39, "5":39, "6":22} }, '+
+' {"1":{"1":34, "2":66}, "2":{"1":18, "2":36, "3":46}, "3":{"2":43, "3":57}, "4":{"4":63, "6":37}, "5":{"5":64, "6":36}, "6":{"4":39, "5":39, "6":22} }, '+
+' {"1":{"1":34, "2":66}, "2":{"1":18, "2":36, "3":46}, "3":{"2":43, "3":57}, "4":{"4":63, "6":37}, "5":{"5":64, "6":36}, "6":{"4":39, "5":39, "6":22} }, '+
+' {"1":{"1":34, "2":66}, "2":{"1":18, "2":36, "3":46}, "3":{"2":43, "3":57}, "4":{"4":63, "6":37}, "5":{"5":64, "6":36}, "6":{"4":39, "5":39, "6":22} } '+
+'] }';
+var transition_data = JSON.parse(transition_json);
+transition_data =transition_data["transitions"];
 
 
 function initializeGameboard()	{
+	if (trial_number == 1)	{
+		stations_data = stations_0_data;
+		paths_data = paths_0_data;
+		direct_paths = direct_paths_0;
+		strategy_data = strategy_0_data;
+		strategy_pic_path = "images/strategy_0.png";
+	}
+	else if (trial_number == 2)	{
+		stations_data = stations_1_data;
+		paths_data = paths_1_data;
+		direct_paths = direct_paths_1;
+		strategy_data = strategy_1_data;
+		strategy_pic_path = "images/strategy_1.png";
+	}
+	else if (trial_number == 3)	{
+		stations_data = stations_2_data;
+		paths_data = paths_2_data;
+		direct_paths = direct_paths_2;
+		strategy_data = strategy_2_data;
+		strategy_pic_path = "images/strategy_2.png";
+	}
+	else if (trial_number == 4)	{
+		stations_data = stations_3_data;
+		paths_data = paths_3_data;
+		direct_paths = direct_paths_3;
+		strategy_data = strategy_3_data;
+		strategy_pic_path = "images/strategy_3.png";
+	}
+	else if (trial_number == 5) {
+		stations_data = stations_4_data;
+		paths_data = paths_4_data;
+		direct_paths = direct_paths_4;
+		strategy_data = strategy_4_data;
+		strategy_pic_path = "images/strategy_4.png";
+	}
+	var round_title_elem = document.createElement("p");
+	round_title_elem.setAttribute("style" , "font-size:200%; font-weight:bold; color:#9999ee; text-align:center;");
+	round_title_elem.innerHTML = "Round " + trial_number.toString();
+	document.getElementById("game-div").appendChild(round_title_elem);
 	createStations();
-	createPaths();
-	addEventListeners();
+	createPaths("game-div");
 	initializeTime();
 	initializeScore();
+	initializeRoulette();
+	initStrategy();
+	officer_strategy = generateSampleStrategy();
+	store_data += "trial_num:"+trial_number.toString() + ";strategy:" + officer_strategy_num.toString();
+}
+
+function initStrategy()	{
+	var elem = document.getElementById('strategy-div');
+	if (elem != null)	{
+		document.getElementById('instruction_6').removeChild(elem);
+	}
+	elem = document.createElement('div');
+	elem.setAttribute("id", "strategy-div");
+	document.getElementById('instruction_6').appendChild(elem);
+	//show image
+	var div_elem = document.getElementById('strategy-div');
+	div_elem.innerHTML += "<u>Officer Strategy:</u><br>";
+	div_elem.innerHTML += "Study the figure below to understand officer's strategy<br><br>";
+	
+	var strat_elem = document.createElement('img');
+	strat_elem.setAttribute("id", "strategy_image");
+	strat_elem.setAttribute("src", strategy_pic_path);
+	strat_elem.setAttribute("height", 475);
+	strat_elem.setAttribute("width", 1000);
+	strat_elem.setAttribute("style", "position: relative;");
+	div_elem.appendChild(strat_elem);
+	//strat_elem = document.getElementById("strategy_image_main");
+	//if (strat_elem == null)	{
+	strat_elem = document.createElement('img');
+	strat_elem.setAttribute("id", "strategy_image_main");
+	strat_elem.setAttribute("src", strategy_pic_path);
+	strat_elem.setAttribute("height", 600);
+	strat_elem.setAttribute("width", 1300);
+	strat_elem.setAttribute("style", "position: absolute; float:right; margin-bottom:10px; margin-top:10px;");
+	document.getElementById("strategy_pic").appendChild(strat_elem);
+	//}
 }
 
 function changeImageSource(elemName, newsrc)	{
@@ -98,8 +128,33 @@ function changeImageSource(elemName, newsrc)	{
 
 function createStations()	{
 	for (var i=1; i<=num_stations; i++)	{
-		createStationById(i, station_static_image);
+		createStationById(i, station_static_image, "game-div");
 	}
+}
+
+// Assuming fixed exit rate for now
+function initializeRoulette()	{
+	var roulette_label_elem = document.createElement("div");
+	roulette_label_elem.setAttribute("id", "rouletteLabel");
+	roulette_label_elem.setAttribute("style", "position: absolute; left:470px; top:175px; font-size:180%; color:#9999ee; visibility:hidden; z-index:15;");
+	roulette_label_elem.innerHTML = "Termination<br>Randomizer:";
+	document.getElementById("game-div").appendChild(roulette_label_elem);
+
+	var roulette_img_elem = document.createElement("img");
+	roulette_img_elem.setAttribute("id", "roulette_image");
+	roulette_img_elem.setAttribute("src", roulette_image);
+	roulette_img_elem.setAttribute("height", 180);
+	roulette_img_elem.setAttribute("width", 180);
+	roulette_img_elem.setAttribute("style", "position: absolute; left:520px; top:260px; visibility:hidden; z-index:15;");
+	document.getElementById("game-div").appendChild(roulette_img_elem);
+
+	var roulette_dial_elem = document.createElement("img");
+	roulette_dial_elem.setAttribute("id", "dial_image");
+	roulette_dial_elem.setAttribute("src", dial_image);
+	roulette_dial_elem.setAttribute("height", 180);
+	roulette_dial_elem.setAttribute("width", 180);
+	roulette_dial_elem.setAttribute("style", "position: absolute; left:520; top:260px; visibility:hidden; transform:rotate(0deg); z-index:15;");
+	document.getElementById("game-div").appendChild(roulette_dial_elem);
 }
 
 function initializeStationTrophies(station_id, left, top)	{
@@ -109,37 +164,51 @@ function initializeStationTrophies(station_id, left, top)	{
 	score_elem.setAttribute("src", trophy_image);
 	score_elem.setAttribute("height", 30);
 	score_elem.setAttribute("width", 30);
-	score_elem.setAttribute("style", "position: absolute; left:"+(left+station_width*0.3)+"px; top:"+(top + station_height*0.65)+"px;");
-	document.getElementById("game-div").appendChild(score_elem);
+	score_elem.setAttribute("style", "position: absolute; left:"+(station_width*0.3+42)+"px; top:"+(station_height*0.65)+"px;");
+	document.getElementById("station_div"+station_id.toString()).appendChild(score_elem);
+	
 	var score_label_elem = document.createElement("div");
 	score_label_elem.setAttribute("id", "trophyLabel"+station_id.toString());
-	score_label_elem.setAttribute("style", "position: absolute; left:"+(left+station_width*0.3+35)+"px; top:"+(top + station_height*0.65)+"px; font-size:180%");
-	document.getElementById("game-div").appendChild(score_label_elem);
-	document.getElementById("trophyLabel"+station_id.toString()).innerHTML = "x" + trophies_num.toString();
+	score_label_elem.setAttribute("style", "position: absolute; left:"+(station_width*0.3)+"px; top:"+(station_height*0.65)+"px; font-size:180%");
+	document.getElementById("station_div"+station_id.toString()).appendChild(score_label_elem);
+	document.getElementById("trophyLabel"+station_id.toString()).innerHTML = trophies_num.toString() + "x";
+	
 	var station_label_elem = document.createElement("div");
 	station_label_elem.setAttribute("id", "stationName"+station_id.toString());
-	station_label_elem.setAttribute("style", "position: absolute; left:"+(left+station_width*0.3)+"px; top:"+(top + station_height*0.65 - 80)+"px;");
-	document.getElementById("game-div").appendChild(station_label_elem);
-	document.getElementById("stationName"+station_id.toString()).innerHTML = "Station " + station_id.toString();
+	station_label_elem.setAttribute("style", "position: absolute; left:"+(station_width*0.3)+"px; top:"+(station_height*0.65 - 80)+"px; font-size:120%");
+	document.getElementById("station_div"+station_id.toString()).appendChild(station_label_elem);
+	document.getElementById("stationName"+station_id.toString()).innerHTML = "Station" + station_id.toString();
 }
 
-function createStationById(station_id, station_image) 	{
+function createStationById(station_id, station_image, parent_div) 	{
 	var top = stations_data.stations[station_id.toString()]['top'];
 	var left = stations_data.stations[station_id.toString()]['left'];
-	var trophies = stations_data.stations[station_id.toString()]['trophies'];
-	var station_elem = document.createElement("img");
-	//alert("Here " + station_id.toString());
-	station_elem.setAttribute("id", "station"+station_id.toString());
-	station_elem.setAttribute("src", station_image);
-	station_elem.setAttribute("height", station_height);
-	station_elem.setAttribute("width", station_width);
+	var station_elem = document.createElement("div");
+	station_elem.setAttribute("id", "station_div"+station_id.toString());
 	station_elem.setAttribute("style", "position: absolute; left:"+left+"px; top:"+top+"px;");
-	document.getElementById("game-div").appendChild(station_elem);
+	document.getElementById(parent_div).appendChild(station_elem);
+
+	var station_image_elem = document.createElement("img");
+	station_image_elem.setAttribute("id", "station"+station_id.toString());
+	station_image_elem.setAttribute("src", station_image);
+	station_image_elem.setAttribute("height", station_height);
+	station_image_elem.setAttribute("width", station_width);
+	//station_image_elem.setAttribute("style", "position: absolute; left:"+left+"px; top:"+top+"px;");
+	station_image_elem.setAttribute("style", "position: absolute;");
+	document.getElementById("station_div"+station_id.toString()).appendChild(station_image_elem);
 	
 	initializeStationTrophies(station_id, left, top);
 }
 
-function createPaths()	{
+function getTime(from, to)	{
+	for (var i=0; i<paths_data.paths.length; i++)	{
+		if (paths_data.paths[i]['from'] == from && paths_data.paths[i]['to'] == to)	{
+			return paths_data.paths[i]['time'];
+		}
+	}
+}
+
+function createPaths(parent_div)	{
 	var size = 10;
 	for (var i=0; i<direct_paths.paths.length; i++)	{
 		var from_station = direct_paths.paths[i]['from'];
@@ -153,17 +222,22 @@ function createPaths()	{
 				start_point_left = end_point_left;
 				end_point_left = temp;
 			}
-			start_point_left = start_point_left + station_width;
-			for (j=start_point_left; j<end_point_left;)	{
+			start_point_left = start_point_left + station_width +5;
+			for (j=start_point_left; j<end_point_left-size;)	{
 				var arrow_elem = document.createElement("img");
 				var elem_num = Math.floor(j / (2*size));
 				arrow_elem.setAttribute("src", station_static_image);
 				arrow_elem.setAttribute("height", size);
 				arrow_elem.setAttribute("width", size);
-				arrow_elem.setAttribute("style", "position: absolute; left:"+j+"px; top:"+top+"px; transform:rotate(180deg);");
-				document.getElementById("game-div").appendChild(arrow_elem);
+				arrow_elem.setAttribute("style", "position: absolute; left:"+j+"px; top:"+top+"px;");
+				document.getElementById(parent_div).appendChild(arrow_elem);
 				j += 2*size;
 			}
+			/*var time = getTime(from_station, to_station);
+			var time_elem = document.createElement("div");
+			time_elem.setAttribute("style", "position: absolute; left:"+(end_point_left-90)+"px; top:"+(top-30)+"px; font-size:24px; font-weight:bold; color:#60bf86");
+			time_elem.innerHTML = "Time: " + time;
+			document.getElementById(parent_div).appendChild(time_elem);*/
 		}
 		else if (direct_paths.paths[i]['orientation'] == 'diagonal')	{
 			var start_point_top = stations_data.stations[from_station.toString()]['top'];;
@@ -174,29 +248,33 @@ function createPaths()	{
 				var temp = start_point_top;
 				start_point_top = end_point_top;
 				end_point_top = temp;
-				temp = start_point_left;
-				start_point_left = end_point_left;
-				end_point_left = temp;
 			}
-			start_point_top += station_height;
+			start_point_top += station_height/2;
 			start_point_left += station_width/2;
+			end_point_left += station_width/2;
+			end_point_top += station_height/2;
 			for (j=start_point_top; j<end_point_top;)	{
 				var arrow_elem = document.createElement("img");
-				var elem_num = Math.floor(j / (2*size));
+				var elem_num = Math.floor( (j-start_point_top) / (2*size));
 				var left = start_point_left;
 				if (start_point_left < end_point_left)	{
-					left += elem_num*size/2;
+					left += (end_point_left - start_point_left) * (j-start_point_top) / (end_point_top-start_point_top);
 				}
 				else 	{
-					left -= elem_num*size/2;
+					left -= Math.abs((end_point_left - start_point_left) * (j-start_point_top) / (end_point_top-start_point_top));
 				}
 				arrow_elem.setAttribute("src", station_static_image);
 				arrow_elem.setAttribute("height", size);
 				arrow_elem.setAttribute("width", size);
-				arrow_elem.setAttribute("style", "position: absolute; left:"+left+"px; top:"+j+"px; transform:rotate(180deg);");
-				document.getElementById("game-div").appendChild(arrow_elem);
+				arrow_elem.setAttribute("style", "position: absolute; left:"+left+"px; top:"+j+"px;z-index:1;");
+				document.getElementById(parent_div).appendChild(arrow_elem);
 				j += 2*size;
 			}
+			/*var time = getTime(from_station, to_station);
+			var time_elem = document.createElement("div");
+			time_elem.setAttribute("style", "position: absolute; left:"+(start_point_left+Math.abs(end_point_left-start_point_left)/2+40)+"px; top:"+(start_point_top + Math.abs(end_point_top-start_point_top)/2+35)+"px; font-size:24px; font-weight:bold; color:#60bf86");
+			time_elem.innerHTML = "Time: " + time;
+			document.getElementById(parent_div).appendChild(time_elem);*/
 		}
 	}
 }
@@ -206,8 +284,8 @@ function createPaths()	{
 // Time or Life bar
 var max_time = 100;
 var timeLeft;
-var time_unit_width = 27;
-var time_unit_height = 27;
+var time_unit_width = 22;
+var time_unit_height = 22;
 var time_hori_spacer = 2;
 var time_vert_spacer = 4;
 
@@ -227,15 +305,18 @@ function createTimeUnit(left,top,id)	{
 }
 
 function updateTime(timeTaken)	{
+	if (from_station != to_station)	{
+		timeTaken = timeTaken + 1;
+	}
 	if ((timeLeft - timeTaken) < 0)	{
 		alert("Illegal move");
 		return false;
 	}
-	for(id=timeLeft-1; id >= (timeLeft - timeTaken); id--) {
-		document.getElementById("time"+id.toString()).src = unfilled_heart_image;
-		//alert('change');
-	}
 	timeLeft -= timeTaken;
+	//for(id=timeLeft-1; id >= (timeLeft - timeTaken); id--) {
+	for(id=0; id < (max_time - timeLeft); id++) {
+		document.getElementById("time"+id.toString()).src = unfilled_heart_image;
+	}
 	if (timeLeft > max_time)	{
 		timeLeft = max_time;
 	}
@@ -256,51 +337,33 @@ function initializeTime()	{
 
 
 // Score bar
-var max_score = 50;
 var max_score_width = 400;
 var total_score = 0;
-
-// get position of score board for animation
-
-
-//var unfilled_score_image = "images/hourglass-md.png";
-//var filled_score_image = "images/score_filled.jpg";
-
 
 function updateScore(station_id, score)	{
 	total_score += score;
 	if (total_score < 0)	{
 		total_score = 0;
 	}
-	if (total_score > max_score)	{
-		total_score = max_score;
-	}
-	var trophy_elems = new Array(score);
-	for (var i=1; i<=score; i++) {
-		trophy_elems[i-1] = document.getElementById("trophy"+station_id.toString()+""+i)
-	}
 	disable_play();
 	document.getElementById('score-value').innerHTML = total_score;
+	for (var i=total_score-score; i< total_score; i++)	{
+		var trophy_elem = document.createElement("img");
+		trophy_elem.setAttribute("id", "trophy_bar"+i.toString());
+		trophy_elem.setAttribute("src", trophy_image);
+		trophy_elem.setAttribute("height", 12);
+		trophy_elem.setAttribute("width", 12);
+		trophy_elem.setAttribute("style", "position: relative; left:"+2+"px; top:"+2+"px;");
+		document.getElementById("score-div").appendChild(trophy_elem);
+	}
 }
 
 var score_left = 0;
 var score_top = 0;
 function initializeScore()	{
+	total_score = 0;
 	// get location of score div (using jQuery)
 	var offset = $(document.getElementById("score-div")).offset();
 	score_left = offset.left
 	score_top = offset.top;
-}
-
-//disable clicks (for animation in progress)
-function disable_play() {
-	removeEventListeners();
-}
-
-// enable clicks (after animation)
-function enable_play() {
-	changeImageSource("station"+to_station.toString(), station_static_image);
-	from_station = to_station;
-	to_station = null;
-	addEventListeners();
 }

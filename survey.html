@@ -1,0 +1,205 @@
+<html>
+<head>
+<title>End-Game Survey</title>
+<style type="text/css">
+#main-content	{
+	width:95%;
+	float: center;
+	position: relative;
+	margin:20px;
+	padding:15px;
+	border-radius: 10px;
+}
+#form-content	{
+	width:94%;
+	float: center;
+	position: relative;
+	margin:20px;
+	padding: 20px;
+	font-weight: bold;
+	font-size: 18px;
+	border-radius: 10px;
+}
+</style>
+
+<script type="text/javascript">
+function initAMTUser()	{
+	var prmstr = window.location.search.substr(1);
+	var prmarr = prmstr.split("=");
+	amt_id = prmarr[1];
+	document.getElementById("amt_user").value = amt_id;
+}
+
+function validateQuestion(ques_num)	{
+	var qFilled = false;
+	var q_array = document.getElementsByName('q'+ques_num);
+	for (var i=0; i < q_array.length; i++)	{
+		if (q_array[i].checked)
+			qFilled = true;
+	}
+	if (!qFilled)	{
+		alert('Please answer question '+ques_num);
+		return false;
+	}
+	return true;
+}
+
+function validateForm()	{
+	if (!validateQuestion(1))
+		return false;
+	if (!validateQuestion(2))
+		return false;
+	if (!validateQuestion(3))
+		return false;
+	if (!validateQuestion(4))
+		return false;
+	if (!validateQuestion(5))
+		return false;
+	if (!validateQuestion(6))
+		return false;
+	if (!validateQuestion(7))
+		return false;
+	if (!validateQuestion(8))
+		return false;
+	if (!validateQuestion(10))
+		return false;
+	if (!validateQuestion(12))
+		return false;
+	if (!validateQuestion(13))
+		return false;
+	if (!validateQuestion(14))
+		return false;
+	if (!validateQuestion(15))
+		return false;
+	return true;
+}
+
+</script>
+</head>
+
+<body onload="initAMTUser()">
+<div id="main-content">
+<div id="form-content">
+	<center>
+		<font size="6">End-Game Survey</font>
+		<br><hr><br>
+		<form id="user_info_form" method="post" action="store_end_game_survey.php" onsubmit="return validateForm()">
+			<input type="hidden" name="amt_user" id="amt_user" value="default">
+			<label style="color:#4444cc;"><i>For the following items, please select the choice that best describes you (yes or no)</i></label>
+			<br><br>
+			<label style="color:#444499;">Q1. I sometimes like to do things that are a little frightening.</label><br>
+			<input type="radio" name="q1" value="no">No
+			<input type="radio" name="q1" value="yes">Yes
+			<input type="radio" name="q1" value="no-answer">Prefer not to answer
+			<br><br><br>
+
+			<label style="color:#444499;">Q2. I think I would enjoy the sensations of skiing very fast down a high mountain slope.</label><br>
+			<input type="radio" name="q2" value="no">No
+			<input type="radio" name="q2" value="yes">Yes
+			<input type="radio" name="q2" value="no-answer">Prefer not to answer
+			<br><br><br>
+
+			<label style="color:#444499;">Q3. I like to explore a strange city or section of town myself, even if it means getting lost.</label><br>
+			<input type="radio" name="q3" value="no">No
+			<input type="radio" name="q3" value="yes">Yes
+			<input type="radio" name="q3" value="no-answer">Prefer not to answer
+			<br><br><br>
+
+			<label style="color:#444499;">Q4. I have tried marijuana or would like to.</label><br>
+			<input type="radio" name="q4" value="no">No
+			<input type="radio" name="q4" value="yes">Yes
+			<input type="radio" name="q4" value="no-answer">Prefer not to answer
+			<br><br><br>
+
+			<label style="color:#444499;">Q5. I would like to try some of the new drugs that produce hallucinations.</label><br>
+			<input type="radio" name="q5" value="no">No
+			<input type="radio" name="q5" value="yes">Yes
+			<input type="radio" name="q5" value="no-answer">Prefer not to answer
+			<br><br><br>
+
+			<label style="color:#444499;">Q6. I would like to take off on a trip with no preplanned or definite routes or timetables.</label><br>
+			<input type="radio" name="q6" value="no">No
+			<input type="radio" name="q6" value="yes">Yes
+			<input type="radio" name="q6" value="no-answer">Prefer not to answer
+			<br><br><br>
+
+			<label style="color:#444499;">Q7. I like wild "uninhibited" parties.</label><br>
+			<input type="radio" name="q7" value="no">No
+			<input type="radio" name="q7" value="yes">Yes
+			<input type="radio" name="q7" value="no-answer">Prefer not to answer
+			<br><br><br>
+
+			<label style="color:#444499;">Q8. I like to have new and exciting experiences and sensations even if they are a little unconventional or illegal.</label><br>
+			<input type="radio" name="q8" value="no">No
+			<input type="radio" name="q8" value="yes">Yes
+			<input type="radio" name="q8" value="no-answer">Prefer not to answer
+			<br><br><br>
+
+			<br><br>
+			<label style="color:#4444cc;"><i>Please provide us with your feedback about the game.</i></label>
+			<br><br>
+
+			<label style="color:#444499;">Q9. Please tell us about your experience playing the game.</label><br>
+			<textarea rows="6" cols="70" name="q9" > </textarea>
+			<br><br><br>
+
+			<label style="color:#444499;">Q10. Did you use a particular strategy in playing the game?</label><br>
+			<input type="radio" name="q10" value="no">No
+			<input type="radio" name="q10" value="yes">Yes
+			<br><br><br>
+
+			<label style="color:#444499;">Q11. If yes, please specify:</label><br>
+			<textarea rows="6" cols="70" name="q11" > </textarea>
+			<br><br><br>
+
+			<label style="color:#444499;">Q12. Please rate the extent to which you understood the game instructions. <br> (1 = Extremely difficult to understand ..... 7 = Extremely easy to understand)</label><br>
+			<input type="radio" name="q12" value="1">1
+			<input type="radio" name="q12" value="2">2
+			<input type="radio" name="q12" value="3">3
+			<input type="radio" name="q12" value="4">4
+			<input type="radio" name="q12" value="5">5
+			<input type="radio" name="q12" value="6">6
+			<input type="radio" name="q12" value="7">7
+			<br><br><br>
+
+			<label style="color:#444499;">Q13. Rate the extent to which you were motivated to win money/stars while playing the game. <br> (1 = Extremely unmotivated ..... 7 = Extremely motivated)</label><br>
+			<input type="radio" name="q13" value="1">1
+			<input type="radio" name="q13" value="2">2
+			<input type="radio" name="q13" value="3">3
+			<input type="radio" name="q13" value="4">4
+			<input type="radio" name="q13" value="5">5
+			<input type="radio" name="q13" value="6">6
+			<input type="radio" name="q13" value="7">7
+			<br><br><br>
+
+			<label style="color:#444499;">Q14. Rate the extent to which you were motivated to avoid officer as you played the game. <br> (1 = Extremely unmotivated ..... 7 = Extremely motivated)</label><br>
+			<input type="radio" name="q14" value="1">1
+			<input type="radio" name="q14" value="2">2
+			<input type="radio" name="q14" value="3">3
+			<input type="radio" name="q14" value="4">4
+			<input type="radio" name="q14" value="5">5
+			<input type="radio" name="q14" value="6">6
+			<input type="radio" name="q14" value="7">7
+			<br><br><br>
+
+			<label style="color:#444499;">Q15. Rate the extent to which your starting location influenced how you played the game. <br> (1 = No influence ..... 7 = Influenced to a great extent)</label><br>
+			<input type="radio" name="q15" value="1">1
+			<input type="radio" name="q15" value="2">2
+			<input type="radio" name="q15" value="3">3
+			<input type="radio" name="q15" value="4">4
+			<input type="radio" name="q15" value="5">5
+			<input type="radio" name="q15" value="6">6
+			<input type="radio" name="q15" value="7">7
+			<br><br><br>
+
+			<label style="color:#444499;">Q16. How could the game be improved?</label><br>
+			<textarea rows="6" cols="70" name="q16" > </textarea>
+			<br><br><br>
+			<button name="submit" type="submit">Submit</button>
+		</form>
+	</center>
+</div>
+</div>
+</body>
+
+</html>

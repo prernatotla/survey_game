@@ -1,0 +1,121 @@
+<html>
+<head>
+<title>Survey Game</title>
+<style type="text/css">
+#main-content	{
+	width:95%;
+	float: center;
+	position: relative;
+	margin:20px;
+	padding:15px;
+	border-radius: 10px;
+}
+#form-content	{
+	width:90%;
+	float: center;
+	position: relative;
+	margin:20px;
+	padding: 20px;
+	font-weight: bold;
+	font-size: 18px;
+	border-radius: 10px;
+}
+</style>
+
+<script type="text/javascript">
+function validateForm()	{
+	var sexFilled = false;
+	var sex_array = document.getElementsByName('sex');
+	for (var i=0; i < sex_array.length; i++)	{
+		if (sex_array[i].checked)
+			sexFilled = true;
+	}
+	if (!sexFilled)	{
+		alert('Please select an option for "Sex"');
+		return false;
+	}
+
+	var raceFilled = false;
+	var race_array = document.getElementsByName('race');
+	for (var i=0; i < race_array.length; i++)	{
+		if (race_array[i].checked)
+			raceFilled = true;
+	}
+	if (!raceFilled)	{
+		alert('Please select an option for "Race"');
+		return false;
+	}
+
+	var incomeFilled = false;
+	var income_array = document.getElementsByName('income');
+	for (var i=0; i < income_array.length; i++)	{
+		if (income_array[i].checked)
+			incomeFilled = true;
+	}
+	if (!incomeFilled)	{
+		alert('Please select an option for "Income"');
+		return false;
+	}
+
+	var ageFilled = false;
+	var age_array = document.getElementsByName('age');
+	for (var i=0; i < age_array.length; i++)	{
+		if (age_array[i].value != "")
+			ageFilled = true;
+	}
+	if (!ageFilled)	{
+		alert('Please select an option for "Age"');
+		return false;
+	}
+
+	return true;
+}
+
+</script>
+</head>
+
+<body>
+<div id="main-content">
+<div id="form-content">
+	<center>
+		<font size="6">Game Survey</font>
+		<br><hr><br>
+		<form id="user_info_form" method="post" action="store_user_info.php" onsubmit="return validateForm()">
+			<label style="color:#444499;">Q1. Please specify your sex:</label><br>
+			<input type="radio" name="sex" value="male">Male
+			<input type="radio" name="sex" value="female">Female
+			<input type="radio" name="sex" value="no-specify">Do not wish to specify
+			<br><br><br>
+			<label style="color:#444499;">Q2. Please select the racial/ethnic group with which you most closely identify (select one):</label><br>
+			<input type="radio" name="race" value="african-american">African-American
+			<input type="radio" name="race" value="asian">Asian/Asian-American
+			<input type="radio" name="race" value="hispanic">Hispanic/Latino <br>
+			<input type="radio" name="race" value="american-indian">American Indian/Alaskan Native
+			<input type="radio" name="race" value="hawaiin">Native Hawaiian/Pacific Islander <br>
+			<input type="radio" name="race" value="white">White/Caucasian/European-American/Middle Eastern
+			<input type="radio" name="race" value="mixed">Mixed ethnic group <br>
+			<input type="radio" name="race" value="other">Other (Please specify): <input type="text" name="other-race"/>
+			<br><br><br>
+			<label style="color:#444499;">Q3. What is your yearly household income:</label><br>
+			<input type="radio" name="income" value="less_25000">$0-$25,000
+			<input type="radio" name="income" value="less_50000">$25,000-$50,000
+			<input type="radio" name="income" value="less_75000">$50,000-$75,000
+			<input type="radio" name="income" value="less_100000">$75,000-$100,000 <br>
+			<input type="radio" name="income" value="less_125000">$100,000-$125,000
+			<input type="radio" name="income" value="less_150000">$125,000-$150,000
+			<input type="radio" name="income" value="above">Above $150,000
+			<br><br><br>
+			<label style="color:#444499;">Q4. What is your age:</label><br>
+			<input type="text" name="age" />
+			<br><br><br>
+			<label style="color:#444499;">Q5. What is your email address: (optional)</label><br>
+			<input type="text" name="email" />
+			<br><br><br>
+			<button name="submit" type="submit">Submit</button>
+		</form>
+	</center>
+</div>
+</div>
+</body>
+
+</html>

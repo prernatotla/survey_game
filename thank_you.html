@@ -1,0 +1,34 @@
+<html>
+<head>
+<title>End-Game Survey</title>
+<style type="text/css">
+#main-content	{
+	width:100%;
+	position: relative;
+	margin:20px;
+	padding:15px;
+	border-radius: 10px;
+	text-align: center;
+	font-size: 40px;
+}
+</style>
+</head>
+<body>
+	<div id="main-content">
+		Thank you!<br><br>
+		AMT - Worker ID: 
+		<script type="text/javascript">
+		var prmstr = window.location.search.substr(1);
+		var prmarr = prmstr.split("=");
+		var amt_id = 0;
+		if (prmarr.length > 0)	{
+			amt_id = prmarr[1];
+		}
+		if (amt_id == null || amt_id == 0)	{
+			amt_id = 0;
+		}
+		document.write(amt_id);
+		</script>
+	</div>
+</body>
+</html>

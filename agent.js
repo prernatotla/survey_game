@@ -2,6 +2,7 @@ var agentSize = 50;
 var agentImage = "images/agent.png";
 var agentPosition_x;
 var agentPosition_y;
+var agentMoving = false;
 
 function initializeAgent()	{
 	// Select station at random for agent to start at
@@ -13,6 +14,11 @@ function initializeAgent()	{
 	agentPosition_x = station_left + (station_width - agentSize)/2;
 	agentPosition_y = station_top + (station_height - agentSize)/2;
 	createAgent();
+	store_data += ";start:" + from_station.toString() + ";moves:[";
+	to_station = from_station;
+	updateTimeBar();
+	updateScoreBar();
+	addEventListeners();
 }
 
 function createAgent()	{
